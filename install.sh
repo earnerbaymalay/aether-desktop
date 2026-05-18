@@ -7,6 +7,11 @@ RST="\033[0m"
 
 echo -e "${ACCENT}🌌 Initializing Aether-Tauri macOS Setup...${RST}"
 
+echo -e "NOTE: For the smoothest experience, download the official DMG from:"
+echo -e "https://github.com/earnerbaymalay/aether-tauri/releases/latest"
+echo -e ""
+echo -e "Proceeding with source-build setup (Advanced)..."
+
 # Check for Homebrew
 if ! command -v brew &>/dev/null; then
     echo "Homebrew not found. Installing..."
