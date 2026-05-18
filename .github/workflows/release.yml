@@ -46,18 +46,25 @@ jobs:
         run: |
           # Detect target triple for Tauri sidecar naming
           if [[ "${{ matrix.platform }}" == "macos-latest" ]]; then
-            TARGET="x86_64-apple-darwin"
+            ARCH=$(uname -m)
+            if [[ "$ARCH" == "arm64" ]]; then TARGET="aarch64-apple-darwin"; else TARGET="x86_64-apple-darwin"; fi
           elif [[ "${{ matrix.platform }}" == "ubuntu-latest" ]]; then
             TARGET="x86_64-unknown-linux-gnu"
           else
             TARGET="x86_64-pc-windows-msvc"
           fi
           
-          # Create a dummy or real entry point for the engine
           mkdir -p src-tauri/bin
-          echo "print('Aether Engine Starting...')" > engine_entry.py
-          pyinstaller --onefile --name aether-engine-$TARGET engine_entry.py
+          # Package the real agent core
+          # We include the 'agent' directory to ensure all modules are available
+          pyinstaller --onefile --name aether-engine-$TARGET \
+            --add-data "agent:agent" \
+            --hidden-import uvicorn \
+            --hidden-import fastapi \
+            agent/aether_agent.py
+            
           mv dist/aether-engine-$TARGET src-tauri/bin/
+          chmod +x src-tauri/bin/aether-engine-$TARGET
         shell: bash
 
       - name: Install dependencies (Linux)
