@@ -34,8 +34,11 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install PyInstaller
-        run: pip install pyinstaller fastapi uvicorn
+      - name: Install Python Dependencies
+        run: |
+          pip install pyinstaller fastapi uvicorn rich requests psutil chromadb cryptography zeroconf
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        shell: bash
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -44,7 +47,6 @@ jobs:
 
       - name: Build Python Sidecar (aether-engine)
         run: |
-          # Detect target triple for Tauri sidecar naming
           if [[ "${{ matrix.platform }}" == "macos-latest" ]]; then
             ARCH=$(uname -m)
             if [[ "$ARCH" == "arm64" ]]; then TARGET="aarch64-apple-darwin"; else TARGET="x86_64-apple-darwin"; fi
@@ -56,11 +58,11 @@ jobs:
           
           mkdir -p src-tauri/bin
           # Package the real agent core
-          # We include the 'agent' directory to ensure all modules are available
           pyinstaller --onefile --name aether-engine-$TARGET \
             --add-data "agent:agent" \
             --hidden-import uvicorn \
             --hidden-import fastapi \
+            --hidden-import rich \
             agent/aether_agent.py
             
           mv dist/aether-engine-$TARGET src-tauri/bin/
@@ -74,7 +76,9 @@ jobs:
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
 
       - name: Install frontend dependencies
-        run: npm install
+        run: |
+          npm install
+          npm install --save-dev esbuild
 
       - name: Build and release
         uses: tauri-apps/tauri-action@v0
