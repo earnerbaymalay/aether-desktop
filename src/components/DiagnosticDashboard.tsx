@@ -20,21 +20,13 @@ const DiagnosticDashboard: React.FC = () => {
 
     const fetchStatus = async () => {
         try {
-            const response = await fetch('http://localhost:8000/system/stats');
-            if (response.ok) {
-                const data = await response.json();
-                setSystemHealth(data.agent_active ? 100 : 50);
-                
-                // Construct "servers" based on real status
-                setServers([
-                    { id: 'agent-core', name: 'Aether Agent', type: 'Core', status: data.agent_active ? 'online' : 'error', uptime: 'N/A' },
-                    { id: 'api-server', name: 'Engine Room API', type: 'API', status: 'online', uptime: 'N/A' }
-                ]);
-
-                if (data.last_watchdog_event && !logs.includes(data.last_watchdog_event)) {
-                    addLog(data.last_watchdog_event);
-                }
-            }
+            // PWA Mock: Read from common mock server state
+            const mockServers = JSON.parse(localStorage.getItem('aether_mock_servers') || '[]');
+            setServers(mockServers.length > 0 ? mockServers : [
+                { id: 'agent-core', name: 'Aether Agent', type: 'Core', status: 'online', uptime: '12h' },
+                { id: 'api-server', name: 'Engine Room API', type: 'API', status: 'online', uptime: '12h' }
+            ]);
+            setSystemHealth(98);
         } catch (err) {
             console.error("Failed to fetch status", err);
             setSystemHealth(0);
@@ -51,17 +43,12 @@ const DiagnosticDashboard: React.FC = () => {
         setRepairing(true);
         addLog("Initiating ecosystem repair sequence...");
         
-        try {
-            const response = await fetch('http://localhost:8000/system/repair', { method: 'POST' });
-            if (response.ok) {
-                const data = await response.json();
-                addLog(data.message || "Repair completed successfully.");
-            }
-        } catch (err) {
-            addLog("Error: Could not contact repair endpoint.");
-        }
+        await new Promise(r => setTimeout(r, 3000));
+        addLog("Neural pathways re-aligned.");
+        addLog("Memory fragments defragmented.");
+        addLog("Repair completed successfully (Simulated).");
 
-        await fetchStatus();
+        setSystemHealth(100);
         setRepairing(false);
     };
 

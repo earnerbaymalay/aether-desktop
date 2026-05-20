@@ -1,0 +1,17 @@
+{
+  "name": "Aether Neural OS",
+  "short_name": "Aether",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050507",
+  "theme_color": "#00f2ff",
+  "icons": [
+    {
+      "src": "/src-tauri/icons/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "description": "The local-first Neural Operating Interface for sovereign intelligence."
+}

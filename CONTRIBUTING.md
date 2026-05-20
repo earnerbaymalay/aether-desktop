@@ -92,13 +92,14 @@ aether-tauri/
 
 The following features are tracked as open work items. Contributions welcome:
 
-- [ ] **Settings UI panel** — A native settings overlay to replace the terminal-based `/settings` flow
-- [ ] **AetherVault browser** — A panel to view, search, and delete memory fragments from the Tauri UI
-- [ ] **Model management UI** — Pull, delete, and switch models from the System Panel
-- [ ] **Session persistence** — Save and restore named conversation histories
-- [ ] **Multi-model support** — Add LM Studio and llama.cpp as first-class inference backends alongside Ollama
-- [ ] **AetherLink status widget** — Show P2P sync state in the System Info panel
-- [ ] **Windows toolbox parity** — Ensure all `toolbox/` scripts have working `.ps1` equivalents
+- [ ] **Adaptive Personalization** — Context-aware tone analysis based on Vault history.
+- [ ] **Aether Eye Full Integration** — Real-time screen analysis via local vision models.
+- [ ] **Voice Interface** — Local STT (Whisper) and TTS integration.
+- [ ] **Multi-model support** — Add LM Studio and llama.cpp as first-class inference backends alongside Ollama.
+- [ ] **Sync Status UI** — Visual indicator of AetherLink connection state in the System Panel.
+- [ ] **Windows toolbox parity** — Ensure all `toolbox/` scripts have working `.ps1` equivalents.
+- [ ] **Self-Healing Workflows** — Proactive error recovery for failed tool execution.
+- [ ] **Plugin API** — Standardized interface for community neural skills.
 
 ---
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+// import { invoke } from '@tauri-apps/api/tauri';
 
 // Replacing the terminal-based /settings flow
 const SettingsUI: React.FC = () => {
@@ -9,8 +9,11 @@ const SettingsUI: React.FC = () => {
     useEffect(() => {
         const fetchConfig = async () => {
             try {
-                const data = await invoke('get_settings');
+                const data = JSON.parse(localStorage.getItem('aether_settings') || '{}');
                 setConfig(data);
+                if (data.theme) {
+                    document.body.setAttribute('data-theme', data.theme);
+                }
             } catch (e) {
                 console.error("Failed to load settings:", e);
             } finally {
@@ -20,20 +23,40 @@ const SettingsUI: React.FC = () => {
         fetchConfig();
     }, []);
 
+    const [saveStatus, setSaveStatus] = useState<string | null>(null);
+
     const handleSave = async () => {
         try {
-            await invoke('save_settings', { config });
-            alert("Settings saved successfully.");
+            localStorage.setItem('aether_settings', JSON.stringify(config));
+            if (config.theme) {
+                document.body.setAttribute('data-theme', config.theme);
+            }
+            setSaveStatus("Settings synced to vault.");
+            setTimeout(() => setSaveStatus(null), 3000);
         } catch (e) {
             console.error("Failed to save settings:", e);
+            setSaveStatus("Error saving settings.");
+        }
+    };
+
+    const handleReset = () => {
+        if (confirm("This will wipe all local neural fragments and reset Aether. Continue?")) {
+            localStorage.clear();
+            window.location.reload();
         }
     };
 
     if (loading) return <div>Loading settings...</div>;
 
     return (
-        <div className="settings-panel glass">
+        <div className="view-layer settings-panel glass">
             <h2>Aether Configuration</h2>
+
+            {saveStatus && (
+                <div className="mb-4 p-2 bg-cyan-900/50 border border-cyan-500/50 rounded text-cyan-200 text-sm animate-pulse">
+                    {saveStatus}
+                </div>
+            )}
             
             <div className="setting-group">
                 <label>
@@ -73,7 +96,10 @@ const SettingsUI: React.FC = () => {
                 </label>
             </div>
 
-            <button className="btn btn-nexus" onClick={handleSave}>Save Configuration</button>
+            <div className="flex gap-4">
+                <button className="btn btn-nexus" onClick={handleSave}>Save Configuration</button>
+                <button className="btn" style={{ borderColor: 'var(--red)', color: 'var(--red)' }} onClick={handleReset}>Factory Reset</button>
+            </div>
 
             <style>{`
                 .settings-panel { padding: 20px; }

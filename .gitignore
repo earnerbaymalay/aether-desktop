@@ -20,6 +20,10 @@ src-tauri/bin/
 # Logs
 *.log
 
+# PyInstaller
+build/
+*.spec
+
 # OS
 .DS_Store
 Thumbs.db

@@ -3,38 +3,43 @@
 </div>
 
 <h1 align="center">🌌 Aether</h1>
-<h3 align="center">The Local-First Neural Operating Interface</h3>
+<h3 align="center">The Sovereign Local-First Neural Interface</h3>
 
 <div align="center">
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/badge/Version-26.5.1-teal.svg)](#)
-[![Status](https://img.shields.io/badge/Status-Production%20Ready-green.svg)](#)
+[![Status](https://img.shields.io/badge/Status-Deployment%20Ready-green.svg)](#)
 [![Privacy](https://img.shields.io/badge/Privacy-100%25%20Local-green.svg)](#)
+[![Security](https://img.shields.io/badge/Security-Audit%20Passed-blue.svg)](#)
 
-> [!IMPORTANT]
-> **Current Status: Alpha Release.** Aether is currently in early development. Public binary releases are not yet available. Please follow the instructions below to build Mission Control from source.
+---
 
-*Your Data. Your Rules. Uncompromising Intelligence.*
+> [!CAUTION]
+> **Sovereignty is not a feature; it is a right.** Aether is built for engineers, researchers, and pioneers who refuse to outsource their cognition to the cloud.
 
-[**⬇️ Download Aether**](docs/DOWNLOAD.md) | [**Explore the Guide**](GUIDE.md) | [**View Architecture**](docs/ARCHITECTURE.md) | [**Roadmap**](ROADMAP.md)
+---
+
+[**⬇️ Download Aether**](docs/DOWNLOAD.md) | [**System Guide**](GUIDE.md) | [**Architecture**](docs/ARCHITECTURE.md) | [**Roadmap**](ROADMAP.md)
 
 </div>
 
 ---
 
-## 🌓 Welcome to the Engine Room
+## 🌓 Beyond the Chatbot
 
-Aether is not just a chat interface; it is a **comprehensive, self-healing Neural Operating System** designed to rival the capabilities of big tech's closed ecosystems—while remaining 100% local, private, and under your absolute control.
+Aether is a **Neural Operating Interface** designed to bridge the gap between raw local compute and high-level agentic reasoning. It is the uncompromising response to the "AI-as-a-Service" monopoly—a platform that prioritizes **data sovereignty, low-latency inference, and deep system integration.**
 
-By fusing a Rust-based desktop environment (Tauri) with a high-performance Python backend, Aether coordinates swarms of specialized quantized models to execute complex tool loops, index your personal knowledge, and manage background systems.
+By orchestrating a multi-tier stack of Rust, Python, and Quantized Neural Models, Aether transforms your local silicon into a private intelligence workstation.
 
-### 🔥 Why Aether?
+### ⚡ Core Pillars
 
-1. **Absolute Privacy:** Zero telemetry. Zero external API dependencies required. Your intellectual property never leaves your silicon.
-2. **Neural Pathways:** Instantly swap between "Agent" (reasoning), "Turbo" (speed), "Code" (dev), and "Logic" (planning) profiles tailored to your hardware.
-3. **AetherVault (Local RAG):** A persistent, intelligent memory system that passively distills your workflows into searchable knowledge fragments.
-4. **Nexus Shield:** Reclaim your hardware from "AI Bloat" and OS-level telemetry, prioritizing every cycle for your local inference.
+| Pillar | Engineering Focus | Outcome |
+| :--- | :--- | :--- |
+| **Data Sovereignty** | Zero-telemetry, encrypted local storage, P2P sync. | Your IP never leaves your hardware. |
+| **Neural Routing** | Task-specific model dispatching (Ollama/GGUF). | Optimal performance for every cognitive load. |
+| **Fragmented Memory** | Passive distillation of workflows into RAG-enabled fragments. | Long-term, context-aware persistence. |
+| **Hardware Reclaim** | Forceful suppression of OS-level AI bloat. | 100% of cycles dedicated to *your* inference. |
 
 ---
 

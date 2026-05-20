@@ -26,50 +26,44 @@ The application will handle starting all necessary background services for you.
 
 ---
 
-## ⚡ Slash Commands
+## 🚀 Navigation & Control
 
-Once inside the Aether terminal, you can type these slash commands to interact with the system without talking to the AI.
+Aether's Mission Control interface is organized into specialized views. Use the sidebar to navigate:
 
-| Command | What it does |
-| :--- | :--- |
-| `/help` | Displays a quick reference of all commands. |
-| `/settings` | Opens the configuration menu. You can change themes, toggle UNCENSORED mode, and set your Vault path here. |
-| `/memory` | Displays the last 10 memory fragments saved to your AetherVault. |
-| `/health` | Runs a system vitals check to ensure Ollama, your Vault, and Models are all online and accessible. |
-| `/auto-fix` | Paste an error message here! The LOGIC model will analyze it and suggest a single command to fix the issue. |
-| `/clear` | Clears the terminal screen. |
-| `/exit` | Safely shuts down the Aether agent. |
+- **🧠 Neural Synapse:** Your primary interface for local inference. Select a pathway and start a session.
+- **🗄️ AetherVault:** Browse and manage your long-term memory fragments. Purge or search history with zero cloud overhead.
+- **🌌 Pathways:** View and switch between different cognitive specialists (AGENT, TURBO, LOGIC).
+- **🩺 Health:** Real-time system diagnostics. Monitor neural link latency and service status.
+- **🔌 Integrations:** Manage MCP servers, LSP diagnostics, and external API keys for hybrid workflows.
+- **🏪 Marketplace:** Discover and install new neural skills and toolbox extensions.
+- **🛡️ Security:** Access Nexus Shield controls to harden your OS and suppress telemetry.
+- **📱 Neural Link:** Generate secure P2P sync codes to link your AetherVault with mobile devices.
 
 ---
 
-## 📊 The Neural Monitor
+## 📊 The Diagnostic Dashboard
 
-Aether comes with a standalone text-based dashboard to monitor your system's health. It tracks CPU usage, RAM, and whether your background services (like Ollama and OpenClaw) are alive.
+Aether continuously monitors your hardware to ensure optimal inference performance. The **Diagnostic Dashboard** provides real-time telemetry:
 
-We recommend running this in a separate terminal window alongside Aether:
-
-![Neural Monitor](docs/assets/neural_monitor.png)
+- **CPU & RAM:** Tracks host utilization.
+- **Neural Link:** Monitors the latency of the bridge between the UI and the Python engine.
+- **Service Status:** Confirms that Ollama and OpenClaw are active.
 
 ```bash
-# Run the monitor script directly
-python3 tools/monitor.py
+# For advanced users, the standalone monitor can still be run via:
+python3 toolbox/net_monitor.py
 ```
 
 ---
 
-## 🧠 Neural Pathways (AI Modes)
+## 🧠 Neural Pathways (Cognitive Specialists)
 
-When you launch Aether, you select a "Pathway". You can't change this mid-session (yet!), so choose the right tool for the job:
+Aether routes your intelligence through specialized models. Each pathway is optimized for specific workloads:
 
-<div align="center">
-  <img src="docs/assets/pathway_selection.png" alt="Pathway Selection" width="60%" />
-</div>
-
-- **🤖 AGENT:** Powered by `hermes3:8b`.
- This is your main assistant. Use it when you need Aether to use tools, search the web, or execute complex tasks.
-- **⚡ TURBO:** Powered by `llama3.2:3b`. Extremely fast. Use it for quick questions, translations, or text summarization.
-- **💻 CODE:** Powered by `qwen2.5-coder:3b`. Highly optimized for writing scripts, finding bugs, and refactoring code.
-- **🧠 LOGIC:** Powered by `deepseek-r1:8b`. A slow, deep-thinking model best used for architectural planning and brainstorming.
+- **🤖 AGENT (Hermes-3-8B):** General intelligence and autonomous tool use.
+- **⚡ TURBO (Llama-3.2-3B):** High-speed conversational output and quick tasks.
+- **🧠 LOGIC (DeepSeek-R1):** Advanced reasoning, architecture, and chain-of-thought planning.
+- **💻 CODE (Qwen2.5-Coder):** (Pro) Specialized syntax generation and refactoring.
 
 ---
 

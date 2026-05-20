@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
+import AetherClient from '../services/AetherClient';
+import { ServerStatus } from '../types';
 
 // Aether Unified Integration Hub
 // Monitors MCP/LSP servers and manages API keys securely
@@ -12,30 +13,48 @@ const IntegrationHub: React.FC = () => {
     const refreshStatus = async () => {
         setLoading(true);
         try {
-            const mcpStatuses: any[] = await invoke('get_mcp_status');
-            const isApiOnline: boolean = await invoke('check_api_status');
-            
-            setServers(mcpStatuses.map((s, i) => ({
-                id: `mcp-${i}`,
-                name: s.name.charAt(0).toUpperCase() + s.name.slice(1),
-                type: 'MCP',
-                status: s.status,
-                uptime: s.status === 'online' ? 'Active' : '-'
-            })));
-            
-            setApiStatus(isApiOnline);
-        } catch (err) {
-            console.error("Failed to fetch integration status:", err);
+            const serversData = await AetherClient.getServerStatus();
+            setServers(serversData);
+            setApiStatus(true);
+        } catch (error) {
+            console.error('Integration Hub Sync Error:', error);
+            setApiStatus(false);
         } finally {
             setLoading(false);
         }
     };
 
+
+    const handleRestart = async (id: string) => {
+        setServers(prev => prev.map(s => s.id === id ? { ...s, status: 'restarting' } : s));
+        try {
+            await AetherClient.restartServer(id);
+            // Polling for success
+            setTimeout(() => refreshStatus(), 2000);
+        } catch (error) {
+            console.error('Server Restart Failed:', error);
+            refreshStatus();
+        }
+    };
+
     useEffect(() => {
         refreshStatus();
-        const interval = setInterval(refreshStatus, 5000);
-        return () => clearInterval(interval);
     }, []);
+
+    const [showAdd, setShowAdd] = useState(false);
+    const [newProvider, setNewProvider] = useState({ name: '', type: 'API' });
+
+    const handleAdd = async () => {
+        if (!newProvider.name) return;
+        try {
+            const newSrv = await AetherClient.addProvider(newProvider.name, newProvider.type);
+            setServers(prev => [...prev, newSrv]);
+            setShowAdd(false);
+            setNewProvider({ name: '', type: 'API' });
+        } catch (error) {
+            console.error('Failed to deploy provider:', error);
+        }
+    };
 
     return (
         <div className="view-layer">
@@ -48,11 +67,44 @@ const IntegrationHub: React.FC = () => {
                 <div className="setting-card wide glass">
                     <div className="flex justify-between items-center mb-4">
                         <h3>Active Neural Servers</h3>
-                        <button className="btn btn-small" onClick={refreshStatus} disabled={loading}>
-                            {loading ? 'Refreshing...' : '🔄 Refresh'}
-                        </button>
+                        <div className="flex gap-2">
+                            <button className="btn btn-small" onClick={() => refreshStatus()} disabled={loading}>
+                                {loading ? 'Refreshing...' : '🔄 Refresh'}
+                            </button>
+                            <button className="btn btn-small btn-nexus" onClick={() => setShowAdd(!showAdd)}>
+                                {showAdd ? 'Cancel' : '+ Add'}
+                            </button>
+                        </div>
                     </div>
-                    <p>Background MCP and LSP services powering your ecosystem.</p>
+
+                    {showAdd && (
+                        <div className="mb-6 p-4 bg-white/5 border border-white/10 rounded-lg flex items-end gap-4 animate-fade-in">
+                            <div className="flex-1">
+                                <label style={{ display: 'block', fontSize: '10px', marginBottom: '5px' }}>PROVIDER NAME</label>
+                                <input 
+                                    type="text" 
+                                    value={newProvider.name} 
+                                    onChange={e => setNewProvider({...newProvider, name: e.target.value})}
+                                    style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border)', color: 'white', padding: '8px', width: '100%', borderRadius: '4px' }}
+                                />
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '10px', marginBottom: '5px' }}>TYPE</label>
+                                <select 
+                                    value={newProvider.type} 
+                                    onChange={e => setNewProvider({...newProvider, type: e.target.value})}
+                                    style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border)', color: 'white', padding: '8px', borderRadius: '4px' }}
+                                >
+                                    <option value="API">API</option>
+                                    <option value="MCP">MCP</option>
+                                    <option value="LSP">LSP</option>
+                                </select>
+                            </div>
+                            <button className="btn btn-small btn-nexus" onClick={handleAdd}>Deploy</button>
+                        </div>
+                    )}
+                    
+                    <p style={{ color: 'var(--text-dim)', fontSize: '14px', marginBottom: '20px' }}>Background MCP and LSP services powering your ecosystem.</p>
                     
                     <div className="models-table-wrapper">
                         <table>
@@ -82,13 +134,19 @@ const IntegrationHub: React.FC = () => {
                                         <td>{server.name}</td>
                                         <td>{server.type}</td>
                                         <td>
-                                            <span className={`status ${server.status === 'online' ? 'ok' : 'warn'}`}>
+                                            <span className={`status ${server.status === 'online' ? 'ok' : server.status === 'restarting' ? 'animate-pulse text-cyan-400' : 'warn'}`}>
                                                 {server.status.toUpperCase()}
                                             </span>
                                         </td>
                                         <td>{server.uptime}</td>
                                         <td>
-                                            <button className="btn-small btn">Restart</button>
+                                            <button 
+                                                className="btn-small btn" 
+                                                onClick={() => handleRestart(server.id)}
+                                                disabled={server.status === 'restarting'}
+                                            >
+                                                {server.status === 'restarting' ? 'Wait...' : 'Restart'}
+                                            </button>
                                         </td>
                                     </tr>
                                 ))}
@@ -114,7 +172,7 @@ const IntegrationHub: React.FC = () => {
                             <span className="ok">● Configured</span>
                         </div>
                     </div>
-                    <button className="btn btn-nexus" style={{marginTop: '20px', width: '100%'}}>
+                    <button className="btn btn-nexus" style={{marginTop: '20px', width: '100%'}} onClick={() => setShowAdd(true)}>
                         + Add New Provider
                     </button>
                 </div>

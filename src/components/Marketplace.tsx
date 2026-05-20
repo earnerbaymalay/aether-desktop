@@ -10,6 +10,10 @@ interface Skill {
 
 const Marketplace: React.FC = () => {
     const [skills, setSkills] = useState<Skill[]>([]);
+    const [installed, setInstalled] = useState<string[]>(() => {
+        return JSON.parse(localStorage.getItem('aether_installed_skills') || '[]');
+    });
+    const [installing, setInstalling] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -25,6 +29,22 @@ const Marketplace: React.FC = () => {
         }, 1000);
     }, []);
 
+    const handleInstall = (id: string) => {
+        setInstalling(id);
+        setTimeout(() => {
+            const newInstalled = [...installed, id];
+            setInstalled(newInstalled);
+            localStorage.setItem('aether_installed_skills', JSON.stringify(newInstalled));
+            setInstalling(null);
+        }, 2000);
+    };
+
+    const handleUninstall = (id: string) => {
+        const newInstalled = installed.filter(i => i !== id);
+        setInstalled(newInstalled);
+        localStorage.setItem('aether_installed_skills', JSON.stringify(newInstalled));
+    };
+
     return (
         <div className="view-layer">
             <div className="view-header">
@@ -32,23 +52,38 @@ const Marketplace: React.FC = () => {
                 <p className="view-subtitle">Expand your agent's capabilities with verified local tools.</p>
             </div>
 
-            <div className="grid">
+            <div className="pathway-grid">
                 {skills.map(skill => (
-                    <div key={skill.id} className={`card ${skill.tier === 'pro' ? 'pro-tier' : ''}`}>
-                        <div className="tag">{skill.author.toUpperCase()} // {skill.tier.toUpperCase()}</div>
-                        <h3>{skill.name}</h3>
-                        <p>{skill.description}</p>
-                        <button className={`btn btn-small ${skill.tier === 'pro' ? 'btn-nexus' : ''}`} style={{marginTop: '20px'}}>
-                            {skill.tier === 'pro' ? 'Upgrade to Install' : 'Install Skill'}
-                        </button>
+                    <div key={skill.id} className={`pathway-card ${skill.tier === 'pro' ? 'pro-tier' : ''}`}>
+                        <div className="tag" style={{ fontSize: '10px', color: skill.tier === 'pro' ? 'var(--accent-purple)' : 'var(--accent-cyan)', marginBottom: '8px', fontWeight: 'bold' }}>
+                            {skill.author.toUpperCase()} // {skill.tier.toUpperCase()}
+                        </div>
+                        <h3 style={{ fontSize: '18px', marginBottom: '12px' }}>{skill.name}</h3>
+                        <p style={{ fontSize: '13px', color: 'var(--text-dim)', lineHeight: '1.4' }}>{skill.description}</p>
+                        
+                        <div style={{ marginTop: '24px' }}>
+                            {installed.includes(skill.id) ? (
+                                <button className="btn btn-small" style={{ borderColor: 'var(--red)', color: 'var(--red)', width: '100%' }} onClick={() => handleUninstall(skill.id)}>
+                                    Uninstall
+                                </button>
+                            ) : (
+                                <button 
+                                    className={`btn btn-small ${skill.tier === 'pro' ? 'btn-nexus' : ''}`} 
+                                    style={{ width: '100%' }}
+                                    onClick={() => skill.tier === 'pro' ? alert("Requires Aether Pro Subscription") : handleInstall(skill.id)}
+                                    disabled={installing === skill.id}
+                                >
+                                    {installing === skill.id ? (
+                                        <span className="animate-pulse">Installing...</span>
+                                    ) : (
+                                        skill.tier === 'pro' ? 'Upgrade to Install' : 'Install Skill'
+                                    )}
+                                </button>
+                            )}
+                        </div>
                     </div>
                 ))}
             </div>
-
-            <style>{`
-                .pro-tier { border-color: var(--purple) !important; box-shadow: 0 0 15px rgba(188, 140, 255, 0.1); }
-                .pro-tier .tag { color: var(--purple); }
-            `}</style>
         </div>
     );
 };

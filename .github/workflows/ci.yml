@@ -37,22 +37,22 @@ jobs:
         run: npm install
 
       - name: Build frontend
-        run: npx vite build 2>/dev/null || echo "⚠ Vite build skipped (expected in dev environment)"
+        run: npm run build
 
-      - name: Check Tauri config
+      - name: Check PWA manifest
         run: |
-          if [ -f "src-tauri/tauri.conf.json" ]; then
-            echo "✓ Tauri config exists"
+          if [ -f "dist/manifest.webmanifest" ]; then
+            echo "✓ PWA manifest generated"
           else
-            echo "✗ src-tauri/tauri.conf.json missing"
+            echo "✗ PWA manifest missing"
             exit 1
           fi
 
-      - name: Check README has Sideload link
+      - name: Check README has PWA info
         run: |
-          if grep -q "sideload" README.md; then
-            echo "✓ README contains Sideload link"
+          if grep -q "PWA" README.md; then
+            echo "✓ README contains PWA information"
           else
-            echo "✗ README missing Sideload link"
+            echo "✗ README missing PWA information"
             exit 1
           fi

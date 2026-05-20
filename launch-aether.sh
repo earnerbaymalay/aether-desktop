@@ -33,6 +33,18 @@ if ! pgrep -x "openclaw" > /dev/null; then
     fi
 fi
 
-# 3. Launch Tauri App
-echo "[*] Launching UI..."
-npm run tauri:dev
+# 2.6 Start Aether Core API
+echo "[*] Starting Aether Core API..."
+python3 api_server.py &
+API_PID=$!
+
+# 3. Launch Tauri App with Wakelock
+echo "[*] Launching UI (Caffeine/Caffeinate Active)..."
+if command -v caffeinate &>/dev/null; then
+    caffeinate -i npm run tauri:dev
+else
+    npm run tauri:dev
+fi
+
+# Cleanup
+kill $API_PID

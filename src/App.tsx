@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import AetherClient from './services/AetherClient';
+import { Pathway, SystemHeartbeat } from './types';
 import SetupWizard from './components/SetupWizard';
 import DiagnosticDashboard from './components/DiagnosticDashboard';
 import QRSync from './components/QRSync';
@@ -6,8 +8,10 @@ import IntegrationHub from './components/IntegrationHub';
 import Marketplace from './components/Marketplace';
 import SecurityDashboard from './components/SecurityDashboard';
 import SettingsUI from './components/SettingsUI';
+import NeuralSynapse from './components/NeuralSynapse';
+import AetherVault from './components/AetherVault';
 
-type View = 'PATHWAYS' | 'DIAGNOSTICS' | 'INTEGRATION' | 'SYNC' | 'SETTINGS' | 'MARKETPLACE' | 'SECURITY';
+type View = 'CHAT' | 'VAULT' | 'PATHWAYS' | 'DIAGNOSTICS' | 'INTEGRATION' | 'SYNC' | 'SETTINGS' | 'MARKETPLACE' | 'SECURITY';
 type LayoutMode = 'mission-control' | 'neural-link';
 
 interface Pathway {
@@ -43,16 +47,70 @@ const PATHWAYS: Pathway[] = [
 ];
 
 const App: React.FC = () => {
-    const [showSetup, setShowSetup] = useState(true);
-    const [view, setView] = useState<View>('PATHWAYS');
-    const [layoutMode, setLayoutMode] = useState<LayoutMode>('mission-control');
-    const [activeModel, setActiveModel] = useState('hermes-3-8b');
+    const [showSetup, setShowSetup] = useState(() => {
+        return localStorage.getItem('aether_setup_complete') !== 'true';
+    });
+    const [view, setView] = useState<View>(() => {
+        return (localStorage.getItem('aether_current_view') as View) || 'PATHWAYS';
+    });
+    const [layoutMode, setLayoutMode] = useState<LayoutMode>(() => {
+        return (localStorage.getItem('aether_layout_mode') as LayoutMode) || 'mission-control';
+    });
+    const [activeModel, setActiveModel] = useState(() => {
+        return localStorage.getItem('aether_active_model') || 'hermes-3-8b';
+    });
+    const [pathways, setPathways] = useState<Pathway[]>([]);
+    const [systemStatus, setSystemStatus] = useState<SystemHeartbeat | null>(null);
+
+    useEffect(() => {
+        const initApp = async () => {
+            try {
+                const data = await AetherClient.getPathways();
+                setPathways(data);
+            } catch (e) {
+                console.error("Failed to load pathways", e);
+            }
+        };
+        initApp();
+
+        const heartbeatInt = setInterval(async () => {
+            try {
+                const status = await AetherClient.getHeartbeat();
+                setSystemStatus(status);
+            } catch (e) {
+                setSystemStatus({ status: 'CRITICAL', linkStatus: 'DISCONNECTED', latency: 0 });
+            }
+        }, 10000);
+
+        return () => clearInterval(heartbeatInt);
+    }, []);
+
+    const handleSetView = (newView: View) => {
+        setView(newView);
+        localStorage.setItem('aether_current_view', newView);
+    };
+
+    const handleSetLayoutMode = (newMode: LayoutMode) => {
+        setLayoutMode(newMode);
+        localStorage.setItem('aether_layout_mode', newMode);
+    };
+
+    const handleSetActiveModel = (modelId: string) => {
+        setActiveModel(modelId);
+        localStorage.setItem('aether_active_model', modelId);
+    };
+
+    const completeSetup = () => {
+        setShowSetup(false);
+        localStorage.setItem('aether_setup_complete', 'true');
+    };
 
     if (showSetup) {
-        return <SetupWizard onComplete={() => setShowSetup(false)} />;
+        return <SetupWizard onComplete={completeSetup} />;
     }
 
-    const activePathway = PATHWAYS.find(p => p.id === activeModel) || PATHWAYS[0];
+    const activePathway = pathways.find(p => p.id === activeModel) || pathways[0];
+    if (!activePathway) return <div className="neural-shell items-center justify-center">Initializing Neural Pathways...</div>;
 
     return (
         <div className={`neural-shell ${layoutMode}`}>
@@ -69,6 +127,8 @@ const App: React.FC = () => {
 
                 <div className="nav-group">
                     {[
+                        { id: 'CHAT', icon: '🧠', label: 'Neural Synapse' },
+                        { id: 'VAULT', icon: '🗄️', label: 'AetherVault' },
                         { id: 'PATHWAYS', icon: '🌌', label: 'Pathways' },
                         { id: 'DIAGNOSTICS', icon: '🩺', label: 'Health' },
                         { id: 'INTEGRATION', icon: '🔌', label: 'Integrations' },
@@ -79,7 +139,7 @@ const App: React.FC = () => {
                         <button 
                             key={item.id}
                             className={`nav-btn ${view === item.id ? 'active' : ''}`} 
-                            onClick={() => setView(item.id as View)}
+                            onClick={() => handleSetView(item.id as View)}
                         >
                             <span className="nav-icon">{item.icon}</span>
                             <span className="nav-label">{item.label}</span>
@@ -88,11 +148,11 @@ const App: React.FC = () => {
                 </div>
 
                 <div className="nav-bottom">
-                    <button className="nav-btn" onClick={() => setLayoutMode(prev => prev === 'mission-control' ? 'neural-link' : 'mission-control')}>
+                    <button className="nav-btn" onClick={() => handleSetLayoutMode(layoutMode === 'mission-control' ? 'neural-link' : 'mission-control')}>
                         <span className="nav-icon">🌓</span>
                         <span className="nav-label">{layoutMode === 'mission-control' ? 'Neural Link' : 'Mission Control'}</span>
                     </button>
-                    <button className="nav-btn" onClick={() => setView('SETTINGS')}>
+                    <button className="nav-btn" onClick={() => handleSetView('SETTINGS')}>
                         <span className="nav-icon">⚙️</span>
                         <span className="nav-label">Settings</span>
                     </button>
@@ -102,7 +162,7 @@ const App: React.FC = () => {
             <div className="workspace">
                 <main className="synapse">
                     {view === 'PATHWAYS' && (
-                        <div className="view-layer">
+                        <div className="view-layer animate-fade-in">
                             <div className="view-header">
                                 <h2>Neural Pathways</h2>
                                 <p className="view-subtitle">
@@ -111,11 +171,11 @@ const App: React.FC = () => {
                                 </p>
                             </div>
                             <div className="pathway-grid">
-                                {PATHWAYS.map(pathway => (
-                                    <div 
+                                {pathways.map(pathway => (
+                                    <div
                                         key={pathway.id}
                                         className={`pathway-card ${activeModel === pathway.id ? 'active' : ''}`}
-                                        onClick={() => setActiveModel(pathway.id)}
+                                        onClick={() => handleSetActiveModel(pathway.id)}
                                     >
                                         <div className="pathway-icon">{pathway.icon}</div>
                                         <h3 className="pathway-title">{pathway.title}</h3>
@@ -127,12 +187,16 @@ const App: React.FC = () => {
                         </div>
                     )}
 
-                    {view === 'DIAGNOSTICS' && <DiagnosticDashboard />}
-                    {view === 'INTEGRATION' && <IntegrationHub />}
-                    {view === 'MARKETPLACE' && <Marketplace />}
-                    {view === 'SECURITY' && <SecurityDashboard />}
-                    {view === 'SYNC' && <QRSync />}
-                    {view === 'SETTINGS' && <SettingsUI />}
+                    <div className="animate-fade-in h-full">
+                        {view === 'CHAT' && <NeuralSynapse activeModel={activePathway} />}
+                        {view === 'VAULT' && <AetherVault />}
+                        {view === 'DIAGNOSTICS' && <DiagnosticDashboard />}
+                        {view === 'INTEGRATION' && <IntegrationHub />}
+                        {view === 'MARKETPLACE' && <Marketplace />}
+                        {view === 'SECURITY' && <SecurityDashboard />}
+                        {view === 'SYNC' && <QRSync />}
+                        {view === 'SETTINGS' && <SettingsUI />}
+                    </div>
                 </main>
 
                 <aside className="peripheral">
@@ -148,8 +212,8 @@ const App: React.FC = () => {
                     <div className="peripheral-section">
                         <h3 className="section-label">QUICK ACTIONS</h3>
                         <div className="quick-actions">
-                            <button className="btn btn-small btn-nexus" onClick={() => setView('SYNC')}>Sync Mobile</button>
-                            <button className="btn btn-small" onClick={() => setView('MARKETPLACE')}>Browse Skills</button>
+                            <button className="btn btn-small btn-nexus" onClick={() => handleSetView('SYNC')}>Sync Mobile</button>
+                            <button className="btn btn-small" onClick={() => handleSetView('MARKETPLACE')}>Browse Skills</button>
                         </div>
                     </div>
                 </aside>
