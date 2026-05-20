@@ -301,33 +301,41 @@ async fn check_api_status() -> bool {
 }
 
 #[tauri::command]
-fn start_agent(window: Window, state: State<AppState>) -> Result<(), String> {
-    // Attempt to use sidecar first for bundled releases
-    let sidecar_cmd = tauri::api::process::Command::new_sidecar("aether-engine");
-    
-    let mut child = if let Ok(cmd) = sidecar_cmd {
-        println!("[Main] Spawning Agent as Sidecar...");
-        cmd.stdin(Stdio::piped())
-           .stdout(Stdio::piped())
-           .stderr(Stdio::piped())
-           .spawn()
-           .map_err(|e| format!("Failed to spawn sidecar: {}", e))?
-           .1
-    } else {
-        // Fallback to local python for development
-        println!("[Main] Sidecar not found, falling back to Python...");
-        let python_exe = get_python_exe();
-        let current_dir = std::env::current_dir().map_err(|e| e.to_string())?;
+fn start_agent(window: Window, state: State<AppState>, handle: tauri::AppHandle) -> Result<(), String> {
+    // 1. Resolve sidecar path
+    let sidecar_name = if cfg!(target_os = "windows") { "aether-engine.exe" } else { "aether-engine" };
+    let sidecar_path = handle.path_resolver()
+        .resolve_resource(format!("bin/{}", sidecar_name))
+        .ok_or_else(|| "Could not resolve sidecar path".to_string())?;
 
-        let child = Command::new(python_exe)
-            .arg("agent/aether_agent.py")
-            .env("PYTHONPATH", current_dir.join("agent").to_string_lossy().to_string())
-            .stdin(Stdio::piped())
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
-            .spawn()
-            .map_err(|e| format!("Failed to spawn agent process: {}", e))?;
-        child
+    println!("[Main] Attempting to spawn agent at: {:?}", sidecar_path);
+
+    let mut child_process = Command::new(&sidecar_path)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn();
+
+    let mut child = match child_process {
+        Ok(c) => {
+            println!("[Main] Spawning Agent as Sidecar...");
+            c
+        },
+        Err(e) => {
+            // Fallback to local python for development
+            println!("[Main] Sidecar failed ({}), falling back to Python...", e);
+            let python_exe = get_python_exe();
+            let current_dir = std::env::current_dir().map_err(|e| e.to_string())?;
+
+            Command::new(python_exe)
+                .arg("agent/aether_agent.py")
+                .env("PYTHONPATH", current_dir.join("agent").to_string_lossy().to_string())
+                .stdin(Stdio::piped())
+                .stdout(Stdio::piped())
+                .stderr(Stdio::piped())
+                .spawn()
+                .map_err(|e| format!("Failed to spawn agent process: {}", e))?
+        }
     };
 
     let stdin = child.stdin.take().ok_or("Failed to attach to agent stdin")?;

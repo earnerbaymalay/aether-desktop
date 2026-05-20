@@ -82,6 +82,18 @@ Aether operates on a tri-tier architecture:
 - **Core (Engine Room):** Python FastAPI + Ollama. Manages LLM inference, RAG indexing, and background watchdogs.
 - **Mission Control (Tauri):** The command center for desktop. Features a high-contrast React UI, terminal integration, and Nexus optimization.
 - **Neural Link (Mobile):** Voice-first, high-speed interface for Android, utilizing P2P state synchronization.
+- **Sovereign PWA:** A fully-featured Progressive Web App for low-friction access across browsers, featuring offline support and local-first persistence.
+
+---
+
+## 🌐 The Sovereign PWA
+
+For users who prefer a browser-based workflow without sacrificing sovereignty, Aether includes a production-grade **Progressive Web App (PWA)**:
+
+- **Offline Intelligence:** Service-worker-based caching ensures the interface remains available even without an internet connection.
+- **Local-First Persistence:** Utilizes browser storage and background synchronization with the Aether Core API.
+- **Mobile Optimized:** Install Aether as a standalone app on iOS and Android for a native-like experience.
+- **Secure Link:** Direct, encrypted communication with your local neural engine over LAN.
 
 ---
 
