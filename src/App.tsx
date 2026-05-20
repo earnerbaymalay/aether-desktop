@@ -11,6 +11,7 @@ import SecurityDashboard from './components/SecurityDashboard';
 import SettingsUI from './components/SettingsUI';
 import NeuralSynapse from './components/NeuralSynapse';
 import AetherVault from './components/AetherVault';
+import AetherConstellation from './components/AetherConstellation';
 
 type View = 'CHAT' | 'VAULT' | 'PATHWAYS' | 'DIAGNOSTICS' | 'INTEGRATION' | 'SYNC' | 'SETTINGS' | 'MARKETPLACE' | 'SECURITY';
 type LayoutMode = 'mission-control' | 'neural-link';
@@ -62,6 +63,7 @@ const App: React.FC = () => {
     });
     const [pathways, setPathways] = useState<Pathway[]>([]);
     const [systemStatus, setSystemStatus] = useState<SystemHeartbeat | null>(null);
+    const [initError, setInitError] = useState<string | null>(null);
 
     useEffect(() => {
         const initApp = async () => {
@@ -75,14 +77,24 @@ const App: React.FC = () => {
                 }
             } catch (e) {
                 console.error("Failed to start agent", e);
+                setInitError("NEURAL_ENGINE_WAKEUP_FAILED");
             }
 
-            // 2. Load pathways
+            // 2. Load pathways with timeout
             try {
-                const data = await AetherClient.getPathways();
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error("Init Timeout")), 15000)
+                );
+                
+                const data = (await Promise.race([
+                    AetherClient.getPathways(),
+                    timeoutPromise
+                ])) as Pathway[];
+                
                 setPathways(data);
             } catch (e) {
                 console.error("Failed to load pathways", e);
+                setInitError("LOCAL_API_UNREACHABLE");
             }
         };
         initApp();
@@ -123,8 +135,18 @@ const App: React.FC = () => {
         return <SetupWizard onComplete={completeSetup} />;
     }
 
+    if (initError) {
+        return (
+            <div className="neural-shell items-center justify-center flex-col">
+                <div className="glow-text mb-4">CRITICAL CONNECTION FAILURE</div>
+                <p className="text-dim text-sm mb-6">{initError}</p>
+                <button className="btn btn-nexus" onClick={() => window.location.reload()}>RETRY SYNAPSE</button>
+            </div>
+        );
+    }
+
     const activePathway = pathways.find(p => p.id === activeModel) || pathways[0];
-    if (!activePathway) return <div className="neural-shell items-center justify-center">Initializing Neural Pathways...</div>;
+    if (!activePathway) return <AetherConstellation />;
 
     return (
         <div className={`neural-shell ${layoutMode}`}>
