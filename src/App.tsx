@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { invoke } from '@tauri-apps/api/tauri';
 import AetherClient from './services/AetherClient';
 import { Pathway, SystemHeartbeat } from './types';
 import SetupWizard from './components/SetupWizard';
@@ -64,6 +65,19 @@ const App: React.FC = () => {
 
     useEffect(() => {
         const initApp = async () => {
+            // 1. Start the agent sidecar/backend
+            try {
+                if ((window as any).__TAURI__) {
+                    console.log("[App] Initializing Neural Engine via Tauri...");
+                    await invoke('start_agent');
+                    // Wait a bit for the API server to warm up
+                    await new Promise(r => setTimeout(r, 2000));
+                }
+            } catch (e) {
+                console.error("Failed to start agent", e);
+            }
+
+            // 2. Load pathways
             try {
                 const data = await AetherClient.getPathways();
                 setPathways(data);
