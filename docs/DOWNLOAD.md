@@ -22,6 +22,21 @@ Aether is now bundled with its own Engine. You no longer need to install Python 
 2. Run the installer and follow the prompts.
 3. **Launch.** Aether will automatically verify your hardware and stand by.
 
+#### 🐧 Linux
+1. Download **`Aether-Linux.AppImage`**.
+2. Right-click, select **Properties** > **Permissions**, and check **"Allow executing file as program"**.
+3. Double-click to launch.
+
+---
+
+### 🌐 Browser Access (PWA)
+
+If you prefer to run Aether without installing native software:
+
+1. Visit **[aether.io](https://earnerbaymalay.github.io/aether-tauri/)** (or your hosted URL).
+2. Click the **"Install"** icon in your browser's address bar to add it to your desktop or mobile home screen.
+3. Connect it to your local Aether Core API (default: `http://localhost:8000`).
+
 ---
 
 ### 🛡️ Pre-requisites
