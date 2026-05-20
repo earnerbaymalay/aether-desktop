@@ -15,7 +15,13 @@ Aether is now bundled with its own Engine. You no longer need to install Python 
 #### 🍎 macOS
 1. Download **`Aether-macOS.dmg`**.
 2. Drag **Aether** to your **Applications** folder.
-3. **First Launch:** Right-click the app and select "Open" (to bypass the Alpha security check).
+3. **First Launch (Gatekeeper Bypass):** 
+   - If you see a "Damaged and can't be opened" or "Unverified Developer" error:
+   - Open your **Terminal** and run:
+     ```bash
+     sudo xattr -cr /Applications/Aether.app
+     ```
+   - Then, **Right-click** Aether in your Applications folder and select **Open**.
 
 #### 🪟 Windows
 1. Download **`Aether-Windows.msi`**.
