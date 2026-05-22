@@ -1,0 +1,29 @@
+{
+  "name": "aether-tauri",
+  "productName": "Aether",
+  "version": "26.5.1",
+  "description": "Aether-Tauri — The Local-First Neural Operating Interface. Unified workstation for Windows & macOS.",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^1.5.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "xterm": "^5.3.0",
+    "xterm-addon-fit": "^0.8.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^1.5.9",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^6.0.2",
+    "typescript": "^5.3.0",
+    "vite": "^8.0.12"
+  }
+}

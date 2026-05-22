@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="300" viewBox="0 0 800 300">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="800" height="300" fill="#050505" rx="20"/>
+  
+  <g opacity="0.1">
+    <line x1="0" y1="50" x2="800" y2="50" stroke="#f8fafc" stroke-width="0.5" />
+    <line x1="0" y1="100" x2="800" y2="100" stroke="#f8fafc" stroke-width="0.5" />
+    <line x1="0" y1="150" x2="800" y2="150" stroke="#f8fafc" stroke-width="0.5" />
+    <line x1="0" y1="200" x2="800" y2="200" stroke="#f8fafc" stroke-width="0.5" />
+    <line x1="0" y1="250" x2="800" y2="250" stroke="#f8fafc" stroke-width="0.5" />
+    <line x1="100" y1="0" x2="100" y2="300" stroke="#f8fafc" stroke-width="0.5" />
+    <line x1="200" y1="0" x2="200" y2="300" stroke="#f8fafc" stroke-width="0.5" />
+    <line x1="300" y1="0" x2="300" y2="300" stroke="#f8fafc" stroke-width="0.5" />
+    <line x1="400" y1="0" x2="400" y2="300" stroke="#f8fafc" stroke-width="0.5" />
+    <line x1="500" y1="0" x2="500" y2="300" stroke="#f8fafc" stroke-width="0.5" />
+    <line x1="600" y1="0" x2="600" y2="300" stroke="#f8fafc" stroke-width="0.5" />
+    <line x1="700" y1="0" x2="700" y2="300" stroke="#f8fafc" stroke-width="0.5" />
+  </g>
+
+  <g transform="translate(400, 130)">
+    <circle cx="0" cy="0" r="80" fill="none" stroke="url(#grad1)" stroke-width="1" stroke-dasharray="10 5" opacity="0.3">
+      <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="20s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="0" cy="0" r="60" fill="none" stroke="url(#grad1)" stroke-width="2" filter="url(#glow)" />
+    <path d="M-20,-10 L0,20 L20,-10 Z" fill="url(#grad1)" filter="url(#glow)" />
+  </g>
+
+  <text x="400" y="240" text-anchor="middle" font-family="sans-serif" font-size="32" font-weight="700" fill="#f8fafc" letter-spacing="12" style="font-family: 'Space Grotesk', sans-serif;">AETHER</text>
+  <text x="400" y="270" text-anchor="middle" font-family="monospace" font-size="11" fill="#94a3b8" letter-spacing="3" style="font-family: 'JetBrains Mono', monospace;">LOCAL-FIRST NEURAL OPERATING INTERFACE</text>
+</svg>

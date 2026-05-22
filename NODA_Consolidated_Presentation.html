@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NODA: The Detachable Sovereignty Hub</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&display=swap');
+        
+        :root {
+            --bg-color: #0f1012;
+            --text-color: #e5e7eb;
+            --accent-color: #d97757; /* Copper/Bronze */
+            --accent-glow: rgba(217, 119, 87, 0.2);
+            --card-bg: #1a1c21;
+            --border-color: #2a2d35;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Space Grotesk', sans-serif;
+            overflow: hidden;
+        }
+
+        .slides-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1.2s ease-in-out, transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: scale(1.02);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 50px;
+            box-sizing: border-box;
+            background: radial-gradient(circle at center, #15161a 0%, #0f1012 100%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: scale(1);
+            z-index: 10;
+            pointer-events: all;
+        }
+
+        .slide-content {
+            max-width: 1300px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 60px;
+        }
+
+        .text-content {
+            flex: 1;
+        }
+
+        .image-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image-content img {
+            max-width: 100%;
+            max-height: 75vh;
+            border-radius: 4px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 0 1px var(--border-color);
+        }
+
+        h1 {
+            font-size: 5rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0 0 15px 0;
+            letter-spacing: -2px;
+            line-height: 1.1;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin: 0 0 30px 0;
+            border-bottom: 1px solid var(--accent-color);
+            padding-bottom: 15px;
+            display: inline-block;
+            letter-spacing: -1px;
+        }
+
+        p, li {
+            font-size: 1.25rem;
+            line-height: 1.7;
+            color: #a1a5b0;
+            font-weight: 300;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 20px;
+            position: relative;
+            padding-left: 35px;
+        }
+
+        li::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 10px;
+            width: 15px;
+            height: 1px;
+            background-color: var(--accent-color);
+        }
+        
+        strong {
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            font-weight: 400;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .title-slide {
+            text-align: center;
+        }
+
+        .title-slide img {
+            max-width: 400px;
+            margin-bottom: 40px;
+        }
+
+        .title-slide h1 {
+            font-size: 6rem;
+            margin-bottom: 20px;
+        }
+        
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background-color: var(--accent-color);
+            width: 0%;
+            transition: width 5s linear;
+            z-index: 100;
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        /* Controls */
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 100;
+            display: flex;
+            gap: 15px;
+            opacity: 0.3;
+            transition: opacity 0.3s;
+        }
+
+        .controls:hover {
+            opacity: 1;
+        }
+
+        .btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: monospace;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            background: rgba(217, 119, 87, 0.1);
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 30px;
+            border-radius: 4px;
+        }
+
+        .card h3 {
+            color: var(--accent-color);
+            margin-top: 0;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="progress-bar" id="progress"></div>
+
+    <div class="slides-container" id="slides">
+        
+        <!-- Slide 1: Title -->
+        <div class="slide active title-slide">
+            <img src="/Users/brookeconnor/.gemini/antigravity/brain/8d96034d-38c7-4c44-999a-75274645af00/artifacts/noda_logo.png" alt="NODA Logo">
+            <div class="subtitle">CONSOLIDATED STRATEGIC BLUEPRINT</div>
+            <p style="margin-top: 20px; color: #a1a5b0;">THE DETACHABLE SOVEREIGNTY HUB</p>
+        </div>
+
+        <!-- Slide 2: Vision -->
+        <div class="slide">
+            <div class="slide-content">
+                <div class="text-content" style="flex: 1; text-align: center; max-width: 900px; margin: 0 auto;">
+                    <h2>VISION & MISSION</h2>
+                    <ul style="text-align: left; margin-top: 40px;">
+                        <li><strong>Modular Sovereignty:</strong> A high-end, privacy-first alternative to Google Home and Amazon Echo. Designed for the "Sovereign Prosumer" and the De-Googled movement.</li>
+                        <li><strong>Zero Telemetry by Default:</strong> A hardened environment built to appeal to GDPR/HIPAA-adjacent requirements.</li>
+                        <li><strong>Acoustic Silence:</strong> Passive cooling derived from structural heatsink engineering (Noctua SSO2-inspired logic).</li>
+                        <li><strong>Vendor Agnostic:</strong> Hardware independent, running a custom-engineered, hardened Linux core.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: The Monolith -->
+        <div class="slide">
+            <div class="slide-content">
+                <div class="text-content">
+                    <h2>THE MONOLITH</h2>
+                    <p>The core design philosophy is modular sovereignty packed into a premium physical form factor.</p>
+                    <ul>
+                        <li><strong>Chassis:</strong> Sandblasted Matte Obsidian aluminum.</li>
+                        <li><strong>Heatsink:</strong> Blackened copper fins for silent, passive thermal dissipation.</li>
+                        <li><strong>Display:</strong> Detachable 10-inch glassmorphic OLED screen ("The Forge").</li>
+                        <li><strong>Privacy First:</strong> Physical sliding toggles and "KILL" switches for microphones and cameras.</li>
+                        <li><strong>Expandability:</strong> Gold-plated magnetic pogo pins for hot-swappable hardware.</li>
+                    </ul>
+                </div>
+                <div class="image-content">
+                    <img src="/Users/brookeconnor/.gemini/antigravity/brain/8d96034d-38c7-4c44-999a-75274645af00/artifacts/noda_hero.png" alt="NODA Hardware Concept">
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Design Variants -->
+        <div class="slide">
+            <div class="slide-content" style="flex-direction: column;">
+                <h2 style="align-self: flex-start;">AESTHETIC STANDARDS</h2>
+                <div class="image-content" style="width: 100%; margin-bottom: 30px;">
+                    <img src="/Users/brookeconnor/.gemini/antigravity/brain/8d96034d-38c7-4c44-999a-75274645af00/artifacts/noda_variants.png" alt="Design Variants" style="max-height: 50vh;">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; width: 100%;">
+                    <div class="card">
+                        <h3>CHROMAL STEALTH</h3>
+                        <p style="font-size: 1rem;"><strong>The Flagship.</strong> Matte Obsidian aluminum, blackened copper fins, electric blue LED indicators. For minimalists and executive offices.</p>
+                    </div>
+                    <div class="card">
+                        <h3>HERITAGE ACOUSTIC</h3>
+                        <p style="font-size: 1rem;"><strong>The Enthusiast.</strong> Cream aluminum, nickel-plated copper fins, leather detailing, amber LEDs. For hardware purists.</p>
+                    </div>
+                    <div class="card">
+                        <h3>RAW INDUSTRIAL</h3>
+                        <p style="font-size: 1rem;"><strong>The Developer.</strong> Clear-anodized raw silver aluminum, bright red physical KILL toggles, exposed Torx screws. B2B & Homelab focus.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Software Architecture -->
+        <div class="slide">
+            <div class="slide-content">
+                <div class="image-content">
+                    <img src="/Users/brookeconnor/.gemini/antigravity/brain/8d96034d-38c7-4c44-999a-75274645af00/artifacts/noda_architecture.png" alt="Software Architecture">
+                </div>
+                <div class="text-content" style="padding-left: 40px;">
+                    <h2>THE VIBE-CODED CORE</h2>
+                    <ul>
+                        <li><strong>The Immutable Core:</strong> Built on Alpine Linux/Yocto with a read-only root filesystem and strict eBPF firewall.</li>
+                        <li><strong>Safety Sandbox:</strong> All apps run in restricted rootless Podman containers or WASM sandboxes.</li>
+                        <li><strong>The Forge:</strong> A Generative UI "Vibe-Coded" frontend that builds functional apps via voice/text on the fly.</li>
+                        <li><strong>Neural Sovereignty:</strong> 100% local LLM execution via llama.cpp. Interchangeable model "brains" (Llama, Qwen, Mistral).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Expansion Bricks -->
+        <div class="slide">
+            <div class="slide-content">
+                <div class="text-content">
+                    <h2>EXPANSION ECOSYSTEM</h2>
+                    <p>The I2C/USB bus isolation allows for a modular, hot-swappable recurring revenue stream.</p>
+                    <ul>
+                        <li><strong>SDR / Radio Brick:</strong> Adds Zigbee, Z-Wave, and localized RF control. Secure networking independent of Wi-Fi.</li>
+                        <li><strong>NVMe Storage Brick:</strong> High-capacity local data vault. Converts the Noda core into a secure, encrypted NAS.</li>
+                        <li><strong>Audiophile DAC Brick:</strong> High-fidelity audio processing for localized music libraries and premium entertainment.</li>
+                    </ul>
+                </div>
+                <div class="image-content">
+                    <img src="/Users/brookeconnor/.gemini/antigravity/brain/8d96034d-38c7-4c44-999a-75274645af00/artifacts/noda_bricks.png" alt="Expansion Bricks">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 7: Roadmap -->
+        <div class="slide">
+            <div class="slide-content" style="flex-direction: column;">
+                <h2>PRODUCTION ROLLOUT ROADMAP</h2>
+                <div class="grid-layout" style="margin-top: 30px;">
+                    <div class="card">
+                        <h3>PHASE 1: FOUNDATION</h3>
+                        <ul>
+                            <li><strong>Q3 2026:</strong> Crowdfunding Campaign & "Headless Founders" Beta.</li>
+                            <li>Targeting 2,500 units to advanced FOSS developers.</li>
+                            <li>Establish base OS and local LLM execution.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>PHASE 2: THE LEAP</h3>
+                        <ul>
+                            <li><strong>Q1 2027:</strong> Limited "Chromal Stealth" Complete Bundle Launch.</li>
+                            <li>Train system prompts to output JSON-defined UI components for "The Forge".</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>PHASE 3: ECOSYSTEM</h3>
+                        <ul>
+                            <li><strong>Q3 2027:</strong> Commercial release of Modular Expansion Bricks (NVMe, SDR).</li>
+                            <li>General release of "Heritage Acoustic" line.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>PHASE 4: MARKETPLACE</h3>
+                        <ul>
+                            <li><strong>Q1 2028:</strong> Sovereign App Marketplace Launch.</li>
+                            <li>Opening the local-only, community-vetted FOSS app repository.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="controls">
+        <button class="btn" id="prevBtn">&lt;</button>
+        <button class="btn" id="pauseBtn">||</button>
+        <button class="btn" id="nextBtn">&gt;</button>
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const progressBar = document.getElementById('progress');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        
+        let currentSlide = 0;
+        const SLIDE_DURATION = 8000; // 8 seconds per slide
+        let slideInterval;
+        let isPlaying = true;
+
+        function resetProgress() {
+            progressBar.style.transition = 'none';
+            progressBar.style.width = '0%';
+            
+            if (isPlaying) {
+                // Force reflow
+                void progressBar.offsetWidth;
+                progressBar.style.transition = `width ${SLIDE_DURATION}ms linear`;
+                progressBar.style.width = '100%';
+            }
+        }
+
+        function goToSlide(index) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (index + slides.length) % slides.length;
+            slides[currentSlide].classList.add('active');
+            resetProgress();
+        }
+
+        function nextSlide() {
+            goToSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            goToSlide(currentSlide - 1);
+        }
+
+        function startSlideshow() {
+            if (slideInterval) clearInterval(slideInterval);
+            slideInterval = setInterval(nextSlide, SLIDE_DURATION);
+            isPlaying = true;
+            pauseBtn.textContent = '||';
+            resetProgress();
+        }
+
+        function stopSlideshow() {
+            clearInterval(slideInterval);
+            isPlaying = false;
+            pauseBtn.textContent = '>';
+            progressBar.style.transition = 'none';
+            progressBar.style.width = '0%';
+        }
+
+        function toggleSlideshow() {
+            if (isPlaying) {
+                stopSlideshow();
+            } else {
+                nextSlide();
+                startSlideshow();
+            }
+        }
+
+        // Event Listeners
+        prevBtn.addEventListener('click', () => {
+            stopSlideshow();
+            prevSlide();
+        });
+        
+        nextBtn.addEventListener('click', () => {
+            stopSlideshow();
+            nextSlide();
+        });
+        
+        pauseBtn.addEventListener('click', toggleSlideshow);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                stopSlideshow();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                stopSlideshow();
+                prevSlide();
+            } else if (e.key === ' ') {
+                e.preventDefault();
+                toggleSlideshow();
+            }
+        });
+
+        // Start animation
+        startSlideshow();
+    </script>
+</body>
+</html>
